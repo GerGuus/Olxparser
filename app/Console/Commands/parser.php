@@ -34,21 +34,8 @@ class parser extends Command
         $message = $ads[0]['url']."\n".$ads[0]['id']."\n".$ads[0]['title']."\n".$ads[0]['description']."\n".$ads[0]['time']."\n".$ads[0]['person'];
 
         BotService::sendMessage($message);
+        BotService::sendPhoto($ads[0]['photo']);
 
-        // $url = "https://api.telegram.org/bot".$token."/sendPhoto";
-        // $post_fields = array('chat_id' => $chat_id, 'photo' => $result[0]['photo']);
-
-        // $ch = curl_init();
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        //     "Content-Type:multipart/form-data"
-        // ));
-        // curl_setopt($ch, CURLOPT_URL, $url);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
-        // $result = curl_exec($ch);
-        // curl_close($ch);
-
-        var_dump($result);
     }
 }
 
