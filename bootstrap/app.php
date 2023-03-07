@@ -11,6 +11,8 @@
 |
 */
 
+ini_set("mbstring.regex_retry_limit", "10000000");
+
 $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );

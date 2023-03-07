@@ -27,7 +27,6 @@ class parser extends Command
      */
     public function handle(): void
     {
-        ini_set("mbstring.regex_retry_limit", "10000000");
 
         $ads = ParserService::getAds('https://www.olx.ua/d/uk/nedvizhimost/kvartiry/prodazha-kvartir/kremenchug/?currency=USD&search%5Border%5D=created_at:desc');
 

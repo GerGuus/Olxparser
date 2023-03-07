@@ -4,6 +4,8 @@ namespace App\Services;
 
 use PHPHtmlParser\Dom;
 
+ini_set("mbstring.regex_retry_limit", "10000000");
+
 class ParserService
 {
     public static function getAdInformation($url)
@@ -38,6 +40,7 @@ class ParserService
     }
     public static function getAds($url)
     {
+
         $dom = new Dom;
 
         $dom->loadStr(file_get_contents($url));

@@ -3,14 +3,22 @@
 namespace Tests\Unit;
 
 use App\Services\ParserService;
+use PHPHtmlParser\Dom;
 use PHPUnit\Framework\TestCase;
 
 class ParseTest extends TestCase
 {
     public function testGetAdInformation()
     {
-        $url = 'https://www.olx.ua/d/uk/obyavlenie/1k-kvartira-v-tsentre-svoya-IDQ3Ixc.html';
-        $result = ParserService::getAdInformation($url);
+        $dom = new Dom;
+
+        $dom->loadStr(file_get_contents('https://www.olx.ua/d/uk/nedvizhimost/kvartiry/prodazha-kvartir/kremenchug/?currency=USD&search%5Border%5D=created_at:desc'));
+
+        $ad = $dom->find('div[data-cy=l-card]');
+
+        $adUrl = $ad->find('a', 0)->getAttribute('href');
+
+        $result = ParserService::getAdInformation($adUrl);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('url', $result);
