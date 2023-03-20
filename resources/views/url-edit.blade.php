@@ -1,7 +1,8 @@
 <x-app-layout>
     <div>
-        <form method="POST" action="{{ route('url.store') }}">
+        <form method="POST" action="{{ route('url.update', $url) }}">
             @csrf
+            @method("PUT")
             <x-text-input id="url_submit" class="block mt-1 w-full"
                           type="text"
                           name="url"/>
