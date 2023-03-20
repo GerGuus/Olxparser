@@ -14,9 +14,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
 Route::get('/', function () {
     return view('welcome');
 });
+
 Route::resource('url', \App\Http\Controllers\UrlController::class);
 
 Route::get('/dashboard', function () {
