@@ -19,6 +19,12 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('twoaactorauthentication', function () {
+    return view('2fa');
+});
+
+Route::get('2fa', [\App\Http\Controllers\TwoFactorAuthenticationController::class]);
+
 Route::resource('url', \App\Http\Controllers\UrlController::class);
 
 Route::get('/dashboard', function () {
