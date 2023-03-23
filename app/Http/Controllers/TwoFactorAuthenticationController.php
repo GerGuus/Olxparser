@@ -8,7 +8,7 @@ use Illuminate\View\View;
 
 class TwoFactorAuthenticationController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(LoginRequest $request)
     {
         if ($request->code === session()->get('2fa')) {
 

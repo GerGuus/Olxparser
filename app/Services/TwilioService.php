@@ -21,7 +21,7 @@ class TwilioService
 
     public function __construct ()
     {
-        $this->twilio = new Client(config('twilio_account_sid'), config('twilio_auth_token'));
+        $this->twilio = new Client(config('twilio.twilio_account_sid'), config('twilio.twilio_auth_token'));
     }
     public static function sendMessage ($message, $phone)
     {
@@ -29,7 +29,7 @@ class TwilioService
         // Where to send a text message (your cell phone?)
             $phone,
             array(
-                'from' => config('twilio_phone'),
+                'from' => config('twilio.twilio_phone'),
                 'body' => $message
             )
         );

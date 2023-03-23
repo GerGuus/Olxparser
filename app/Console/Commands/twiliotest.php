@@ -27,7 +27,7 @@ class twiliotest extends Command
     public function handle(): void
     {
         $account_sid = 'AC85874eef6bec82cfc40dcfd06ae3c032';
-        $auth_token = '1dcb368936c2a1c58732496787d458e1';
+        $auth_token = '244d55197cc91dab3c7a669c75948290';
         // In production, these should be environment variables. E.g.:
         // $auth_token = $_ENV["TWILIO_AUTH_TOKEN"]
 

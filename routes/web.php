@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UrlController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,9 +24,7 @@ Route::get('twoaactorauthentication', function () {
     return view('2fa');
 });
 
-Route::get('2fa', [\App\Http\Controllers\TwoFactorAuthenticationController::class]);
-
-Route::resource('url', \App\Http\Controllers\UrlController::class);
+Route::resource('url', UrlController::class);
 
 Route::get('/dashboard', function () {
     return view('dashboard');

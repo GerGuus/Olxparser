@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Services\TwilioService;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -32,6 +34,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            '2facode' => ['integer', 'max:6']
         ];
     }
 
@@ -44,35 +47,14 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $user = User::where('email', $this->email)->first();
+        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            RateLimiter::hit($this->throttleKey());
 
-        if (! Hash::check($this->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
-
-        if (! $user->has_2fa) {
-            if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-                RateLimiter::hit($this->throttleKey());
-
-                throw ValidationException::withMessages([
-                    'email' => trans('auth.failed'),
-                ]);
-            }
-
-            RateLimiter::clear($this->throttleKey());
-        }
-
-        $twilioCode = mt_rand(0, 999999);
-
-        TwilioService::sendMessage($twilioCode, $user->phone);
-
-        session([
-            'email' => $user->email,
-            'password' => $user->password,
-            '2fa' => $twilioCode]);
-        redirect()->route('twoaactorauthentication');
+        RateLimiter::clear($this->throttleKey());
     }
 
     /**
@@ -104,5 +86,43 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
+    }
+    public function TwoFactorAuthentication()
+    {
+        $user = User::where('email', $this->email)->first();
+
+        if (! Hash::check($this->password, $user->password)) {
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+        if (! $user->has_2fa) {
+            return;
+        }
+
+        $this->send2FACode($user);
+
+        return redirect()->route('2faform');
+    }
+    public function send2FACode($user)
+    {
+        $twilioCode = mt_rand(0, 999999);
+
+        TwilioService::sendMessage($twilioCode, $user->phone);
+
+        session([
+            'userId' => $user->id,
+            '2facode' => $twilioCode]);
+    }
+    public function checkCode()
+    {
+        if ($this->input('2facode') !== session()->get('2facode')) {
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+        Auth::loginUsingId(session()->get('userId'));
     }
 }
