@@ -34,7 +34,6 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
-            '2facode' => ['integer', 'max:6']
         ];
     }
 
@@ -86,43 +85,5 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
-    }
-    public function TwoFactorAuthentication()
-    {
-        $user = User::where('email', $this->email)->first();
-
-        if (! Hash::check($this->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
-        }
-
-        if (! $user->has_2fa) {
-            return;
-        }
-
-        $this->send2FACode($user);
-
-        return redirect()->route('2faform');
-    }
-    public function send2FACode($user)
-    {
-        $twilioCode = mt_rand(0, 999999);
-
-        TwilioService::sendMessage($twilioCode, $user->phone);
-
-        session([
-            'userId' => $user->id,
-            '2facode' => $twilioCode]);
-    }
-    public function checkCode()
-    {
-        if ($this->input('2facode') !== session()->get('2facode')) {
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
-        }
-
-        Auth::loginUsingId(session()->get('userId'));
     }
 }

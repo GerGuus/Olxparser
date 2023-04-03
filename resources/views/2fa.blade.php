@@ -1,6 +1,6 @@
 <x-app-layout>
     <div>
-        <form method="GET" action="{{ route('2fa') }}">
+        <form method="GET" action="{{ route('2fa-check.store') }}">
             @csrf
             <x-text-input id="url_submit" class="block mt-1 w-full"
                           type="text"
