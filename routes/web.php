@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware('2fa')->group(function () {
     Route::get('2fa-check', [TwoFactorAuthenticationController::class, 'index'])
         ->name('2fa-check.index');
-    Route::delete('2fa-check', [TwoFactorAuthenticationController::class, 'store'])
+    Route::post('2fa-check', [TwoFactorAuthenticationController::class, 'store'])
         ->name('2fa-check.store');
 });
 

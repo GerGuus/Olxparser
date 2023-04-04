@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TwoFARequest;
+use App\Providers\RouteServiceProvider;
 use App\Services\LoginService;
-use Couchbase\View;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+
 
 class TwoFactorAuthenticationController extends Controller
 {
@@ -21,9 +20,15 @@ class TwoFactorAuthenticationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(TwoFARequest  $request)
     {
         LoginService::checkCode($request);
+
+        $request->session()->forget('2fa');
+
+        $request->session()->regenerate();
+
+        return redirect()->intended(RouteServiceProvider::HOME);
     }
 
 }

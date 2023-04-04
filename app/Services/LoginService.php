@@ -9,7 +9,7 @@ use Illuminate\Validation\ValidationException;
 
 class LoginService
 {
-    public static function TwoFactorAuthentication($request)
+    public static function HasTwoFactorAuthentication($request)
     {
         $user = User::where('email', $request->email)->first();
 
@@ -42,12 +42,13 @@ class LoginService
     }
     public static function checkCode($request)
     {
-        if ($request->input('2faCode') !== session()->get('2faCode')) {
+        if ($request->input('2faCode') != session()->get('2fa.2faCode')) {
             throw ValidationException::withMessages([
                 '2faCode' => trans('auth.failed'),
             ]);
         }
 
-        Auth::loginUsingId(session()->get('userId'));
+
+       Auth::loginUsingId(session()->get('2fa.userId'));
     }
 }
