@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UrlUpdateRequest;
-use App\Models\Url;;
+use App\Models\Url;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class UrlController extends Controller
@@ -34,7 +33,6 @@ class UrlController extends Controller
      */
     public function store(UrlUpdateRequest $request): RedirectResponse
     {
-
         Url::create($request->all() + ['user_id' => Auth::user()->id]);
 
         return redirect()->route('url.index');
@@ -45,7 +43,6 @@ class UrlController extends Controller
      */
     public function show(Url $url)
     {
-        //
     }
 
     /**
@@ -73,7 +70,7 @@ class UrlController extends Controller
      */
     public function destroy(Url $url): RedirectResponse
     {
-//        Url::where('id', $url->id)->delete();
+        //        Url::where('id', $url->id)->delete();
         Url::destroy($url->id);
         return redirect()->route('url.index');
     }

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TwoFactorAuthenticationController;
 use App\Http\Controllers\UrlController;
@@ -16,7 +15,6 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
 
 Route::get('/', function () {
     return view('welcome');
@@ -41,4 +39,4 @@ Route::middleware('2fa')->group(function () {
         ->name('2fa-check.store');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

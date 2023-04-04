@@ -36,12 +36,12 @@ class twiliotest extends Command
 
         $client = new Client($account_sid, $auth_token);
         $client->messages->create(
-        // Where to send a text message (your cell phone?)
+            // Where to send a text message (your cell phone?)
             '+380666243521',
-            array(
+            [
                 'from' => $twilio_number,
-                'body' => 'I sent this message in under 10 minutes!'
-            )
+                'body' => 'I sent this message in under 10 minutes!',
+            ]
         );
     }
 }

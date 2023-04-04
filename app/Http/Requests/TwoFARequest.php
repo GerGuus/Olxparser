@@ -3,10 +3,6 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
 
 class TwoFARequest extends LoginRequest
 {
@@ -21,12 +17,12 @@ class TwoFARequest extends LoginRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     * @return array<string, array|\Illuminate\Contracts\Validation\Rule|string>
      */
     public function rules(): array
     {
         return [
-            '2fa-code' => ['integer', 'max:6']
+            '2fa-code' => ['integer', 'max:6'],
         ];
     }
 }

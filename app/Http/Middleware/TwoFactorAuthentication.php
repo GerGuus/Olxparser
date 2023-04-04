@@ -16,7 +16,7 @@ class TwoFactorAuthentication
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (empty(session()->get('2fa'))){
+        if (empty(session()->get('2fa'))) {
             return redirect()->intended(RouteServiceProvider::HOME);
         }
 

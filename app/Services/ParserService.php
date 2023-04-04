@@ -10,9 +10,9 @@ class ParserService
 {
     public static function getAdInformation($url)
     {
-        $dom = new Dom;
+        $dom = new Dom();
 
-        $temp = file_get_contents('https://www.olx.ua'.$url);
+        $temp = file_get_contents('https://www.olx.ua' . $url);
 
         $dom->loadStr($temp);
 
@@ -35,31 +35,31 @@ class ParserService
             'description' => $description,
             'time' => $time,
             'person' => $person,
-            'photo' => $photo
+            'photo' => $photo,
         ];
     }
+
     public static function getAds($url)
     {
-
-        $dom = new Dom;
+        $dom = new Dom();
 
         $dom->loadStr(file_get_contents($url));
 
         $cards = $dom->find('div[data-cy=l-card]');
 
-        $result = array();
+        $result = [];
         foreach ($cards as $card) {
             $adUrl = $card->find('a', 0)->getAttribute('href');
             $adInfo = ParserService::getAdInformation($adUrl);
-            $result[] = array(
+            $result[] = [
                 'url' => $adInfo['url'],
                 'id' => $adInfo['adId'],
                 'title' => $adInfo['title'],
                 'description' => $adInfo['description'],
                 'time' => $adInfo['time'],
                 'person' => $adInfo['person'],
-                'photo' => $adInfo['photo']
-            );
+                'photo' => $adInfo['photo'],
+            ];
         }
         return $result;
     }

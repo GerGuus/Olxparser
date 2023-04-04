@@ -10,7 +10,7 @@ class ParseTest extends TestCase
 {
     public function testGetAdInformation()
     {
-        $dom = new Dom;
+        $dom = new Dom();
 
         $dom->loadStr(file_get_contents('https://www.olx.ua/d/uk/nedvizhimost/kvartiry/prodazha-kvartir/kremenchug/?currency=USD&search%5Border%5D=created_at:desc'));
 
@@ -34,7 +34,6 @@ class ParseTest extends TestCase
     {
         $url = 'https://www.olx.ua/d/uk/nedvizhimost/kvartiry/prodazha-kvartir/kremenchug/?currency=USD&search%5Border%5D=created_at:desc';
         $result = ParserService::getAds($url);
-
 
         $this->assertIsArray($result);
         $this->assertCount(7, $result[0]);
