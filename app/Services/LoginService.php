@@ -2,14 +2,26 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\TwoFARequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
+/**
+ *Provides services for user login, two-factor authentication, and 2FA code verification.
+ */
 class LoginService
 {
-    public static function HasTwoFactorAuthentication($request)
+    /**
+     *Send 2FA code if user has two-factor authentication enabled.
+     *
+     *@throws ValidationException if login credentials are invalid
+     *
+     *@return bool True if user does not have 2FA enabled, false send 2FA code
+     */
+    public static function HasTwoFactorAuthentication(LoginRequest $request): bool
     {
         $user = User::where('email', $request->email)->first();
 
@@ -28,7 +40,10 @@ class LoginService
         return false;
     }
 
-    public static function send2FACode($user)
+    /**
+     *Sends a two-factor authentication code and put it into session.
+     */
+    public static function send2FACode(User $user): void
     {
         $twilioCode = mt_rand(100000, 999999);
 
@@ -42,7 +57,12 @@ class LoginService
         ]);
     }
 
-    public static function checkCode($request)
+    /**
+     *Verifies the two-factor authentication code and logins user.
+     *
+     *@throws ValidationException if the 2FA code is invalid
+     */
+    public static function checkCode(TwoFARequest $request): void
     {
         if ($request->input('2faCode') != session()->get('2fa.2faCode')) {
             throw ValidationException::withMessages([
