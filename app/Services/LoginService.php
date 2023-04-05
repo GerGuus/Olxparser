@@ -2,46 +2,29 @@
 
 namespace App\Services;
 
-use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\TwoFARequest;
+use App\Mail\LoginMail;
 use App\Models\User;
+use App\Providers\RouteServiceProvider;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 /**
- *Provides services for user login, two-factor authentication, and 2FA code verification.
+ * The LoginService class provides functionality for authenticating users,
+ * sending two-factor authentication codes and verifying them, and sending login
+ * confirmation emails.
  */
 class LoginService
 {
     /**
-     *Send 2FA code if user has two-factor authentication enabled.
+     * Sends a two-factor authentication code to the specified user's phone number and
+     * saves the code in the session for later verification.
      *
-     *@throws ValidationException if login credentials are invalid
+     * @param User $user
      *
-     *@return bool True if user does not have 2FA enabled, false send 2FA code
-     */
-    public static function HasTwoFactorAuthentication(LoginRequest $request): bool
-    {
-        $user = User::where('email', $request->email)->first();
-
-        if (!Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
-            ]);
-        }
-
-        if (!$user->has_2fa) {
-            return true;
-        }
-
-        LoginService::send2FACode($user);
-
-        return false;
-    }
-
-    /**
-     *Sends a two-factor authentication code and put it into session.
+     * @return void
      */
     public static function send2FACode(User $user): void
     {
@@ -51,16 +34,20 @@ class LoginService
 
         session([
             '2fa' => [
-                'userId' => $user->id,
+                'user' => $user,
                 '2faCode' => $twilioCode,
             ],
         ]);
     }
 
     /**
-     *Verifies the two-factor authentication code and logins user.
+     * Verifies the two-factor authentication code and logins user.
      *
-     *@throws ValidationException if the 2FA code is invalid
+     * @param TwoFARequest $request
+     *
+     * @throws ValidationException if the 2FA code is invalid
+     *
+     * @return void
      */
     public static function checkCode(TwoFARequest $request): void
     {
@@ -70,6 +57,40 @@ class LoginService
             ]);
         }
 
-        Auth::loginUsingId(session()->get('2fa.userId'));
+        LoginService::authenticate(session()->get('2fa.user'), $request);
+    }
+
+    /**
+     * Authenticates the given user and logs them in.
+     *
+     * @param User        $user
+     * @param FormRequest $request
+     *
+     * @return \Illuminate\Http\RedirectResponse the redirect response after a successful login
+     */
+    public static function authenticate(User $user, FormRequest $request)
+    {
+        Auth::loginUsingId($user->id);
+
+        LoginService::sendSignEmail($user, $request);
+
+        session()->regenerate();
+
+        return redirect()->intended(RouteServiceProvider::HOME);
+    }
+
+    /**
+     * Sends an email to the user that someone signed in to his account.
+     *
+     * @param User        $user
+     * @param FormRequest $request
+     *
+     * @return void
+     */
+    public static function sendSignEmail(User $user, FormRequest $request)
+    {
+        $ip = $request->getClientIp();
+        $currentDateTime = date(DATE_RFC822);
+        Mail::to($user->email)->send(new LoginMail($currentDateTime, $ip, $user->name));
     }
 }

@@ -13,11 +13,22 @@ class LoginMail extends Mailable
     use Queueable;
     use SerializesModels;
 
+    private string $time;
+    private string $ip;
+    private string $name;
+
     /**
      * Create a new message instance.
+     *
+     * @param mixed $time
+     * @param mixed $ip
+     * @param mixed $name
      */
-    public function __construct()
+    public function __construct($time, $ip, $name)
     {
+        $this->time = $time;
+        $this->ip = $ip;
+        $this->name = $name;
     }
 
     /**
@@ -26,7 +37,8 @@ class LoginMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Login Mail',
+            from: 'example@example.com',
+            subject: 'Login',
         );
     }
 
@@ -36,7 +48,12 @@ class LoginMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'view.name',
+            view: 'mail',
+            with: [
+                'ip' => $this->ip,
+                'time' => $this->time,
+                'name' => $this->name,
+            ],
         );
     }
 

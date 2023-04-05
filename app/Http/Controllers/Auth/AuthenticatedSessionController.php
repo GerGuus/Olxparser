@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Providers\RouteServiceProvider;
 use App\Services\LoginService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,13 +25,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        if (LoginService::HasTwoFactorAuthentication($request)) {
-            $request->authenticate();
+        $user = $request->getUserIfExist();
 
-            $request->session()->regenerate();
-
-            return redirect()->intended(RouteServiceProvider::HOME);
+        if (!$user->has_2fa) {
+            LoginService::authenticate($user, $request);
         }
+
+        LoginService::send2FACode($user);
 
         return redirect()->route('2fa-check.index');
     }
