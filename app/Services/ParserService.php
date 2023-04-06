@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Ad;
+use App\Models\Url;
 use PHPHtmlParser\Dom;
 
 ini_set("mbstring.regex_retry_limit", "10000000");
@@ -39,17 +41,29 @@ class ParserService
         ];
     }
 
-    public static function getAds($url)
+    public static function getAds(Url $url): array
     {
         $dom = new Dom();
 
-        $dom->loadStr(file_get_contents($url));
+        $dom->loadStr(file_get_contents($url->url));
 
         $cards = $dom->find('div[data-cy=l-card]');
 
         $result = [];
         foreach ($cards as $card) {
             $adUrl = $card->find('a', 0)->getAttribute('href');
+
+            print_r($adUrl . "\n");
+
+            $parsedLink = parse_url($adUrl);
+            $cleanLink = explode('?', $parsedLink['path'])[0];
+
+            if (Ad::where('ad', $cleanLink)->exists()) {
+                continue;
+            }
+            echo 'work';
+            Ad::create(['url_id' => $url->id, 'ad' => $cleanLink]);
+
             $adInfo = ParserService::getAdInformation($adUrl);
             $result[] = [
                 'url' => $adInfo['url'],
@@ -61,6 +75,7 @@ class ParserService
                 'photo' => $adInfo['photo'],
             ];
         }
+
         return $result;
     }
 }

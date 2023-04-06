@@ -70,8 +70,8 @@ class UrlController extends Controller
      */
     public function destroy(Url $url): RedirectResponse
     {
-        //        Url::where('id', $url->id)->delete();
         Url::destroy($url->id);
+
         return redirect()->route('url.index');
     }
 }

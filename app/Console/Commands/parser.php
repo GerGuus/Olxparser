@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Url;
 use App\Services\BotService;
 use App\Services\ParserService;
 use Illuminate\Console\Command;
@@ -27,11 +28,24 @@ class parser extends Command
      */
     public function handle(): void
     {
-        $ads = ParserService::getAds('https://www.olx.ua/d/uk/nedvizhimost/kvartiry/prodazha-kvartir/kremenchug/?currency=USD&search%5Border%5D=created_at:desc');
+        $urlList = Url::where('user_id', 1)->get();
 
-        $message = $ads[0]['url'] . "\n" . $ads[0]['id'] . "\n" . $ads[0]['title'] . "\n" . $ads[0]['description'] . "\n" . $ads[0]['time'] . "\n" . $ads[0]['person'];
+        foreach ($urlList as $url) {
+            if ($url->deleted_at == null) {
+                $ads = ParserService::getAds($url);
 
-        BotService::sendMessage($message);
-        BotService::sendPhoto($ads[0]['photo']);
+                foreach ($ads as $ad) {
+                    $message = $ad['url'] .
+                        "\n" . $ad['id'] .
+                        "\n" . $ad['title'] .
+                        "\n" . $ad['description'] .
+                        "\n" . $ad['time'] .
+                        "\n" . $ad['person'];
+
+                    BotService::sendPhoto($ad['photo']);
+                    BotService::sendMessage($message);
+                }
+            }
+        }
     }
 }
