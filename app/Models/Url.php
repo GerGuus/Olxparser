@@ -17,6 +17,7 @@ class Url extends Model
     protected $fillable = [
         'user_id',
         'url',
+        
     ];
 
     public function phone(): HasOne
